@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Board and Peripheral Configuration Schema",
+  "type": "object",
+  "properties": {
+    "peripheral": {
+      "type": "object",
+      "required": ["name", "base_address", "registers"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the peripheral, e.g., 'UART'."
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable description of the peripheral."
+        },
+        "base_address": {
+          "type": "number",
+          "pattern": "^0x[0-9A-Fa-f_]+$",
+          "description": "The base address of the peripheral in hexadecimal."
+        },
+        "registers": {
+          "type": "array",
+          "description": "A list of registers for this peripheral.",
+          "items": {
+            "type": "object",
+            "required": ["name", "offset", "size", "access", "fields"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The short, machine-readable name for the register."
+              },
+              "friendly_name": {
+                "type": "string",
+                "description": "The human-readable name for the register."
+              },
+              "description": {
+                "type": "string",
+                "description": "A human-readable description of the register."
+              },
+              "offset": {
+                "type": "number",
+                "description": "The offset of the register from the base address of the peripheral."
+              },
+              "size": {
+                "type": "number",
+                "description": "The size of the register in bytes."
+              },
+              "access": {
+                "type": "string",
+                "enum": ["R", "W", "RW"],
+                "description": "The access type for the register: Read (R), Write (W), or Read/Write (RW)."
+              },
+              "fields": {
+                "type": "array",
+                "description": "A list of fields within the register.",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "bit_range", "access"],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The name of the field."
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "The description of the field."
+                    },
+                    "bit_range": {
+                      "type": "string",
+                      "pattern": "^(\\d+|\\d+\\.\\.\\d+)$",
+                      "description": "The bit range of the field, e.g., '0' or '1..2'."
+                    },
+                    "access": {
+                      "type": "string",
+                      "enum": ["R", "W", "RW"],
+                      "description": "The access type for the field: Read (R), Write (W), or Read/Write (RW)."
+                    },
+                    "enums": {
+                      "type": "array",
+                      "description": "Enumerated values for multi-bit fields.",
+                      "items": {
+                        "type": "object",
+                        "required": ["name", "value"],
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the enumerated value, e.g., 'NORMAL'."
+                          },
+                          "value": {
+                            "type": "string",
+                            "pattern": "^0b[01X| ]+$",
+                            "description": "The binary value or pattern, e.g., '0b01', '0b0X', or '0b00 | 0b01'."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "A human-readable description of the enumerated value."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

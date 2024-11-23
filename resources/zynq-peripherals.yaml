@@ -1,0 +1,14 @@
+schema: "../board-peripheral-schema.json"
+
+project:
+  name: "Zynq-7000 SoC"
+  description: "A Zynq-7000 SoC is a Xilinx device that combines an ARM Cortex-A9 processor with programmable logic. These set of files describe the peripherals and settings"
+  version: "1.0.0"
+  board: "Arty Z7-10"
+  memory_size: 0x1_0000_0000 # 4GB
+  memory_base: 0x0
+
+includes:
+  - file: "peripherals/uart.yaml"
+  - file: "peripherals/gpio.yaml"
+  - file: "peripherals/timer.yaml"
