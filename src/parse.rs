@@ -1,6 +1,4 @@
-use log::debug;
-
-use crate::config::ProjectWrapper;
+use crate::config::{Peripheral, PeripheralWrapper, Project, ProjectWrapper};
 
 /// Parses the project configuration file into a Project struct
 ///
@@ -9,11 +7,27 @@ use crate::config::ProjectWrapper;
 ///
 /// # Returns
 /// Project - The parsed project configuration
-pub fn parse_project(file_path: &str) -> ProjectWrapper {
+pub fn parse_project(file_path: &str) -> Project {
     let content = std::fs::read_to_string(file_path)
         .unwrap_or_else(|_| panic!("Failed to read file: {}", file_path));
 
-    debug!("File content: {}", content);
+    serde_yaml::from_str::<ProjectWrapper>(&content)
+        .unwrap()
+        .project
+}
 
-    serde_yaml::from_str::<ProjectWrapper>(&content).unwrap()
+/// Parses the peripheral configuration file into a Peripheral struct
+///
+/// # Arguments
+/// file_path: &str - The path to the peripheral configuration file
+///
+/// # Returns
+/// Peripheral - The parsed peripheral configuration
+pub fn parse_peripheral(file_path: &str) -> Peripheral {
+    let content = std::fs::read_to_string(file_path)
+        .unwrap_or_else(|_| panic!("Failed to read file: {}", file_path));
+
+    serde_yaml::from_str::<PeripheralWrapper>(&content)
+        .unwrap()
+        .peripheral
 }

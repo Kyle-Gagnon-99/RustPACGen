@@ -1,6 +1,7 @@
-$schema: "../board-peripheral-schema.json"
+# yaml-language-server: $schema=../board-peripheral-schema.json
 
 project:
+  id: "zynq_700"
   name: "Zynq-7000 SoC"
   description: "A Zynq-7000 SoC is a Xilinx device that combines an ARM Cortex-A9 processor with programmable logic. These set of files describe the peripherals and settings"
   version: "1.0.0"
@@ -10,5 +11,5 @@ project:
 
   includes:
     - file: "peripherals/uart.yaml"
-    - file: "peripherals/gpio.yaml"
-    - file: "peripherals/timer.yaml"
+    #- file: "peripherals/gpio.yaml"
+    #- file: "peripherals/timer.yaml"

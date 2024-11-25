@@ -1,67 +1,71 @@
-use std::collections::HashMap;
-
 use serde::Deserialize;
+
+use crate::utils::StringOrNumber;
 
 #[derive(Debug, Deserialize)]
 pub struct ProjectWrapper {
     pub project: Project,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct PeripheralWrapper {
+    pub peripheral: Peripheral,
+}
+
 /// Represents a single include directive in the project configuration
 #[derive(Debug, Deserialize)]
 pub struct Include {
-    file: String,
+    pub file: String,
 }
 
 /// Repersents the top-level project configuration
 #[derive(Debug, Deserialize)]
 pub struct Project {
-    name: String,
-    description: String,
-    version: String,
-    board: String,
-    memory_size: u64,
-    memory_base: u32,
-    includes: Vec<Include>,
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub version: String,
+    pub board: String,
+    pub memory_size: u64,
+    pub memory_base: u32,
+    pub includes: Vec<Include>,
 }
 
 /// Represents an enumerated value for a multi-bit field.
 #[derive(Debug, Deserialize)]
-pub struct EnumValue {
-    name: String,
-    value: String, // Can be "0b01", "0b0X", or "0b00 | 0b01"
-    description: Option<String>,
+pub struct Values {
+    pub value: StringOrNumber,
+    pub name: Option<String>,
+    pub description: Option<String>,
 }
 
 /// Represents a single field within a register
 #[derive(Debug, Deserialize)]
 pub struct Field {
-    name: String,
-    bit_range: String,
-    access: String,
-    description: Option<String>,
-    value_description: Option<HashMap<u8, String>>,
-    enums: Option<Vec<EnumValue>>,
+    pub id: String,
+    pub bit_range: String,
+    pub access: String,
+    pub description: String,
+    pub reset: Option<u32>,
+    pub values: Option<Vec<Values>>,
 }
 
 /// Represents a single register within a peripheral
 #[derive(Debug, Deserialize)]
 pub struct Register {
-    friendly_name: String,
-    name: String,
-    offset: u32,
-    size: u32,
-    access: String,
-    reset: Option<u32>,
-    fields: Vec<Field>,
+    pub id: String,
+    pub name: String,
+    pub description: String,
+    pub offset: usize,
+    pub size: usize,
+    pub reset: Option<u32>,
+    pub fields: Option<Vec<Field>>,
 }
 
 /// Represents a single peripheral in the project configuration
 #[derive(Debug, Deserialize)]
 pub struct Peripheral {
-    name: String,
-    description: Option<String>,
-    version: Option<String>,
-    interrupt: Option<u32>,
-    registers: Vec<Register>,
+    pub id: String,
+    pub description: String,
+    pub registers: Vec<Register>,
 }

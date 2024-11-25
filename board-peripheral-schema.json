@@ -3,108 +3,166 @@
   "title": "Board and Peripheral Configuration Schema",
   "type": "object",
   "properties": {
-    "peripheral": {
+    "project": {
       "type": "object",
-      "required": ["name", "base_address", "registers"],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "A unique identifier for the project",
+          "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "minLength": 1
+        },
         "name": {
           "type": "string",
-          "description": "The name of the peripheral, e.g., 'UART'."
+          "description": "The name of the project",
+          "minLength": 1
         },
         "description": {
           "type": "string",
-          "description": "A human-readable description of the peripheral."
+          "description": "A description of the project"
         },
-        "base_address": {
-          "type": "number",
-          "pattern": "^0x[0-9A-Fa-f_]+$",
-          "description": "The base address of the peripheral in hexadecimal."
+        "version": {
+          "type": "string",
+          "description": "The version of the project",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
         },
-        "registers": {
+        "board": {
+          "type": "string",
+          "description": "The name of the board"
+        },
+        "includes": {
           "type": "array",
-          "description": "A list of registers for this peripheral.",
+          "description": "The names of the header files to include",
           "items": {
             "type": "object",
-            "required": ["name", "offset", "size", "access", "fields"],
             "properties": {
-              "name": {
+              "file": {
                 "type": "string",
-                "description": "The short, machine-readable name for the register."
-              },
-              "friendly_name": {
-                "type": "string",
-                "description": "The human-readable name for the register."
-              },
-              "description": {
-                "type": "string",
-                "description": "A human-readable description of the register."
-              },
-              "offset": {
-                "type": "number",
-                "description": "The offset of the register from the base address of the peripheral."
-              },
-              "size": {
-                "type": "number",
-                "description": "The size of the register in bytes."
-              },
-              "access": {
-                "type": "string",
-                "enum": ["R", "W", "RW"],
-                "description": "The access type for the register: Read (R), Write (W), or Read/Write (RW)."
-              },
-              "fields": {
-                "type": "array",
-                "description": "A list of fields within the register.",
-                "items": {
-                  "type": "object",
-                  "required": ["name", "bit_range", "access"],
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "description": "The name of the field."
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "The description of the field."
-                    },
-                    "bit_range": {
-                      "type": "string",
-                      "pattern": "^(\\d+|\\d+\\.\\.\\d+)$",
-                      "description": "The bit range of the field, e.g., '0' or '1..2'."
-                    },
-                    "access": {
-                      "type": "string",
-                      "enum": ["R", "W", "RW"],
-                      "description": "The access type for the field: Read (R), Write (W), or Read/Write (RW)."
-                    },
-                    "enums": {
-                      "type": "array",
-                      "description": "Enumerated values for multi-bit fields.",
-                      "items": {
-                        "type": "object",
-                        "required": ["name", "value"],
-                        "properties": {
-                          "name": {
-                            "type": "string",
-                            "description": "The name of the enumerated value, e.g., 'NORMAL'."
-                          },
-                          "value": {
-                            "type": "string",
-                            "pattern": "^0b[01X| ]+$",
-                            "description": "The binary value or pattern, e.g., '0b01', '0b0X', or '0b00 | 0b01'."
-                          },
-                          "description": {
-                            "type": "string",
-                            "description": "A human-readable description of the enumerated value."
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
+                "description": "The name of the header file to include",
+                "minLength": 1
               }
             }
           }
+        }
+      }
+    },
+    "peripheral": {
+      "type": "object",
+      "description": "Peripheral configuration",
+      "properties": {
+        "registers": {
+          "type": "array",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The Rust representation of the peripheral",
+              "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "description": "The name of the peripheral",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "description": "A description of the peripheral"
+            },
+            "offset": {
+              "type": "integer",
+              "description": "The offset of the peripheral in the memory map",
+              "minimum": 0
+            },
+            "access": {
+              "type": "string",
+              "description": "The access rights of the peripheral",
+              "enum": [
+                "RO",
+                "WO",
+                "RW"
+              ]
+            },
+            "reset": {
+              "type": "integer",
+              "description": "The reset value of the peripheral",
+              "minimum": 0
+            },
+            "fields": {
+              "type": "object",
+              "description": "The bit fields of the peripheral",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "The Rust representation of the bit field",
+                  "pattern": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+                  "minLength": 1
+                },
+                "bit_range": {
+                  "type": "string",
+                  "description": "The range of bits in the peripheral register",
+                  "pattern": "^([0-9]+|[0-9]+:[0-9]+)$"
+                },
+                "access": {
+                  "type": "string",
+                  "description": "The access rights of the bit field",
+                  "enum": [
+                    "RO",
+                    "WO",
+                    "RW"
+                  ]
+                },
+                "description": {
+                  "type": "string",
+                  "description": "A description of the bit field"
+                },
+                "reset": {
+                  "type": "integer",
+                  "description": "The reset value of the bit field",
+                  "minimum": 0
+                },
+                "values": {
+                  "type": "object",
+                  "description": "The possible values of the bit field",
+                  "properties": {
+                    "value": {
+                      "type": [
+                        "string",
+                        "integer"
+                      ],
+                      "description": "The value of the bit field",
+                      "minimum": 0
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "The Rust enum representation of the value (for non-single bit fields)",
+                      "pattern": "^[A-Z][a-zA-Z0-9]*$",
+                      "minLength": 1
+                    },
+                    "description": {
+                      "type": "string",
+                      "description": "A description of the value"
+                    }
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "bit_range",
+                "access",
+                "description",
+                "reset"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "description",
+            "offset",
+            "access",
+            "reset",
+            "fields"
+          ]
         }
       }
     }
