@@ -18,11 +18,9 @@ peripheral:
           description: "Software reset for RX data path"
           reset: 0x0
           values:
-            - name: "No"
-              value: 0
+            - value: 0
               description: "No affect"
-            - name: "Yes"
-              value: 1
+            - value: 1
               description: "Receiver logic is reset and all pending receiver data is discarded. This bit is self clearing once the reset has completed"
         - id: "sw_tx_rst"
           bit_range: "1"
@@ -30,12 +28,20 @@ peripheral:
           description: "Software reset for TX data path"
           reset: 0x0
           values:
-            - name: "No"
-              value: 0
+            - value: 0
               description: "No affect"
-            - name: "Yes"
-              value: 1
+            - value: 1
               description: "Transmitter logic is reset and all pending transmitter data is discareded. This bit is self clearing once the reset has completed"
+        - id: "rx_en"
+          bit_range: "2"
+          access: "RW"
+          description: "Receiver enable"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Receiver is disabled"
+            - value: 1
+              description: "Receiver is enabled"
     - id: "mode_register"
       name: "MR"
       description: "Mode Register"

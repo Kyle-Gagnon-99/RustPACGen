@@ -59,6 +59,7 @@ pub struct Register {
     pub offset: usize,
     pub size: usize,
     pub reset: Option<u32>,
+    pub access: String,
     pub fields: Option<Vec<Field>>,
 }
 

@@ -10,10 +10,24 @@ use crate::{
 };
 
 pub fn write_file(file_path: &str, content: &str) {
+    // Make sure the directory exists, if not create it
+    let parent_dir = std::path::Path::new(file_path).parent().unwrap();
+
+    if !parent_dir.exists() {
+        std::fs::create_dir_all(parent_dir).unwrap_or_else(|_| {
+            panic!("Failed to create directory: {}", parent_dir.display());
+        });
+    }
+
     // Write the content to the file
-    std::fs::write(file_path, content).unwrap_or_else(|_| {
-        panic!("Failed to write to file: {}", file_path);
-    });
+    match std::fs::write(file_path, content) {
+        Ok(_) => {
+            debug!("Successfully wrote to file: {}", file_path);
+        }
+        Err(e) => {
+            panic!("Failed to write to file: {}\n{}", file_path, e);
+        }
+    }
 }
 
 pub fn generate_crate(peripherals: &Vec<Peripheral>, output_dir: &str) {
@@ -34,9 +48,19 @@ pub fn generate_crate(peripherals: &Vec<Peripheral>, output_dir: &str) {
     for peripheral in peripherals {
         let peripheral_content = generate_peripheral(&peripheral);
         let peripheral_name = peripheral.id.to_lowercase();
-        let peripheral_file_path = format!("{}/{}.rs", output_dir, peripheral_name);
+        let peripheral_file_path = format!("{}/{}/mod.rs", output_dir, peripheral_name);
 
         write_file(&peripheral_file_path, &peripheral_content);
+
+        // For each register, generate the register module
+        for register in &peripheral.registers {
+            let register_content = generate_register(register);
+            let register_name = register.id.to_lowercase();
+            let register_file_path =
+                format!("{}/{}/{}.rs", output_dir, peripheral_name, register_name);
+
+            write_file(&register_file_path, &register_content);
+        }
     }
 }
 
@@ -223,7 +247,9 @@ pub fn generate_top_level(peripherals: &Vec<Peripheral>) -> String {
         }
     };
 
+    //debug!("Generated Content: #{:?}", &gen_content.to_string());
     let syn_tree = syn::parse2(gen_content).unwrap();
+
     prettyplease::unparse(&syn_tree)
 
     // Return the generated lib.rs file
@@ -231,27 +257,75 @@ pub fn generate_top_level(peripherals: &Vec<Peripheral>) -> String {
 
 pub fn generate_peripheral(peripheral: &Peripheral) -> String {
     let peripheral_name = format_ident!("{}", peripheral.id.to_camel_case());
-    let register: Vec<TokenStream> = peripheral
+
+    let register_initializers: Vec<TokenStream> = peripheral
         .registers
         .iter()
-        .map(|reg| generate_register(reg))
+        .map(|reg| {
+            let reg_name_struct = format_ident!("{}", reg.id.to_pascal_case());
+            let reg_name_member = format_ident!("{}", reg.id.to_snake_case());
+            let offset = reg.offset;
+
+            quote! {
+                #reg_name_member: #reg_name_struct::new(base_address + #offset),
+            }
+        })
         .collect();
 
-    debug!("TokenStream: {:#?}", register);
-    let syn_tree = syn::parse2(quote! {
-        pub struct #peripheral_name {}
+    let register_mod_names: Vec<TokenStream> = peripheral
+        .registers
+        .iter()
+        .map(|reg| {
+            let reg_name = format_ident!("{}", reg.id.to_snake_case());
+            quote! {
+                pub mod #reg_name;
+            }
+        })
+        .collect();
+
+    let register_use_mod_names: Vec<TokenStream> = peripheral
+        .registers
+        .iter()
+        .map(|reg| {
+            let reg_name = format_ident!("{}", reg.id.to_snake_case());
+            quote! {
+                pub use #reg_name::#reg_name;
+            }
+        })
+        .collect();
+
+    //debug!("TokenStream: {:#?}", register);
+    let gen_content = quote! {
+        //! Peripheral: #peripheral_name
+        //! Description: #peripheral.description
+        //! Registers:
+        //! #(#register_mod_names)*
+
+        #(#register_mod_names)*
+
+        #(#register_use_mod_names)*
+
+        pub struct #peripheral_name {
+            address: usize,
+        }
 
         impl #peripheral_name {
-            #(#register)*
+            pub fn new(base_address: usize) -> Self {
+                Self {
+                    address: base_address,
+                    #(#register_initializers)*
+                }
+            }
         }
-    })
-    .unwrap();
+    };
+    debug!("Generated Content: #{:?}", &gen_content.to_string());
+    let syn_tree = syn::parse2(gen_content).unwrap();
 
     prettyplease::unparse(&syn_tree)
 }
 
-pub fn generate_register(register: &Register) -> TokenStream {
-    let register_ident = format_ident!("{}", register.id.to_camel_case());
+pub fn generate_register(register: &Register) -> String {
+    let register_ident = format_ident!("{}", register.id.to_pascal_case());
     let fields: Vec<TokenStream> = register
         .fields
         .as_ref()
@@ -259,6 +333,64 @@ pub fn generate_register(register: &Register) -> TokenStream {
         .iter()
         .map(|field| generate_field(field))
         .collect();
+
+    let enum_fields: Vec<TokenStream> = register
+        .fields
+        .as_ref()
+        .unwrap()
+        .iter()
+        .filter(|field| field.values.is_some() && !is_single_bit(&field.bit_range))
+        .map(|field| generate_enum(field))
+        .collect();
+
+    let reg_access = match register.access.as_str() {
+        "R" => quote! {
+            impl Read for #register_ident {}
+            impl BitAccessRead for #register_ident {}
+            impl FieldAccessRead for #register_ident {}
+        },
+        "W" => quote! {
+            impl Write for #register_ident {}
+            impl BitAccessWrite for #register_ident {}
+            impl FieldAccessWrite for #register_ident {}
+        },
+        "RW" => quote! {
+            impl Read for #register_ident {}
+            impl Write for #register_ident {}
+            impl ReadWrite for #register_ident {}
+            impl BitAccessRead for #register_ident {}
+            impl BitAccessWrite for #register_ident {}
+            impl BitAccessReadWrite for #register_ident {}
+            impl FieldAccessRead for #register_ident {}
+            impl FieldAccessWrite for #register_ident {}
+            impl FieldAccessReadWrite for #register_ident {}
+        },
+        _ => quote! {},
+    };
+
+    let gen_content = quote! {
+        pub struct #register_ident {
+            address: usize,
+        }
+
+        impl Register for #register_ident {
+            fn get_address(&self) -> usize {
+                self.address
+            }
+        }
+
+        #reg_access
+
+        impl #register_ident {
+            pub fn new(address: usize) -> Self {
+                Self { address }
+            }
+
+            #(#fields)*
+        }
+
+        #(#enum_fields)*
+    };
     quote! {
         pub struct #register_ident {
             address: usize,
@@ -270,9 +402,21 @@ pub fn generate_register(register: &Register) -> TokenStream {
             }
         }
 
+        #reg_access
 
-        #(#fields)*
-    }
+        impl #register_ident {
+            pub fn new(address: usize) -> Self {
+                Self {
+                    address
+                }
+            }
+
+            #(#fields)*
+        }
+    };
+
+    let syn_tree = syn::parse2(gen_content).unwrap();
+    prettyplease::unparse(&syn_tree)
 }
 
 pub fn generate_field(field: &Field) -> TokenStream {
@@ -310,12 +454,12 @@ pub fn generate_field(field: &Field) -> TokenStream {
     // The function for Write-Only is called write_bit_no_mask and write_field_no_mask
     // For Read-Write registers, the set method will use the write_bit and write_field methods
     let is_single_bit = is_single_bit(&field.bit_range);
-    let has_enum_values = values.len() > 0;
+    let has_enum_values = values.len() > 0 && !is_single_bit;
     let field_type = if is_single_bit {
         quote! {bool}
     } else {
         if has_enum_values {
-            let enum_name = format_ident!("{}", field.id.to_camel_case());
+            let enum_name = format_ident!("{}", field.id.to_pascal_case());
             quote! {#enum_name}
         } else {
             quote! {u32}
@@ -323,9 +467,17 @@ pub fn generate_field(field: &Field) -> TokenStream {
     };
 
     let get_fn = if access == "R" || access == "RW" {
-        quote! {
-            pub fn #get_fn_name(&self) -> #field_type {
-                self.read_field(#bit_range)
+        if is_single_bit {
+            quote! {
+                pub fn #get_fn_name(&self) -> bool {
+                    self.read_bit(#bit_range)
+                }
+            }
+        } else {
+            quote! {
+                pub fn #get_fn_name(&self) -> #field_type {
+                    self.read_field(#bit_range)
+                }
             }
         }
     } else {
@@ -333,39 +485,48 @@ pub fn generate_field(field: &Field) -> TokenStream {
     };
 
     let set_fn = if access == "W" {
-        quote! {
-            pub fn #set_fn_name(&mut self, value: #field_type) {
-                self.write_field_no_mask(#bit_range, value);
+        if is_single_bit {
+            quote! {
+                pub fn #set_fn_name(&mut self, value: bool) {
+                    self.write_bit_no_mask(#bit_range, value);
+                }
+            }
+        } else {
+            quote! {
+                pub fn #set_fn_name(&mut self, value: #field_type) {
+                    self.write_field_no_mask(#bit_range, value);
+                }
             }
         }
     } else if access == "RW" {
-        quote! {
-            pub fn #set_fn_name(&mut self, value: #field_type) {
-                self.write_field(#bit_range, value);
+        if is_single_bit {
+            quote! {
+                pub fn #set_fn_name(&mut self, value: bool) {
+                    self.write_bit(#bit_range, value);
+                }
+            }
+        } else {
+            quote! {
+                pub fn #set_fn_name(&mut self, value: #field_type) {
+                    self.write_field(#bit_range, value);
+                }
             }
         }
-    } else {
-        quote! {}
-    };
-
-    let enum_def = if has_enum_values {
-        generate_enum(field)
     } else {
         quote! {}
     };
 
     quote! {
         #[doc = #description]
-
         #get_fn
-        #set_fn
 
-        #enum_def
+        #[doc = #description]
+        #set_fn
     }
 }
 
 pub fn generate_enum(field: &Field) -> TokenStream {
-    let enum_name = format_ident!("{}", field.id.to_camel_case());
+    let enum_name = format_ident!("{}", field.id.to_pascal_case());
     let variants: Vec<TokenStream> = field
         .values
         .as_ref()
@@ -421,15 +582,36 @@ pub fn generate_enum(field: &Field) -> TokenStream {
         })
         .collect();
 
+    // Match the value to the enum variant
+    // If it is a wildcard, it is handled separately so skip it
+    let value_to_variant: Vec<TokenStream> = field
+        .values
+        .as_ref()
+        .unwrap()
+        .iter()
+        .filter(|value| {
+            let enum_value = &enum_value_to_string(&value.value);
+            !enum_value.contains('X')
+        })
+        .map(|value| {
+            let variant_name = format_ident!("{}", value.name.as_ref().unwrap().to_pascal_case());
+            let value = enum_val_to_number(&value.value);
+            quote! {
+               #value => #enum_name::#variant_name,
+            }
+        })
+        .collect();
+
     quote! {
         #[derive(Debug, Copy, Clone, PartialEq, Eq)]
         pub enum #enum_name {
-            #(#variants),*
+            #(#variants)*
         }
 
         impl From<u32> for #enum_name {
             fn from(value: u32) -> Self {
                 match value {
+                    #(#value_to_variant)*
                     #(#wildcard_match),*
                     _ => panic!("Invalid value for enum #enum_name: {:#X}", value),
                 }
@@ -439,7 +621,7 @@ pub fn generate_enum(field: &Field) -> TokenStream {
         impl Into<u32> for #enum_name {
             fn into(self) -> u32 {
                 match self {
-                    #(#variant_to_values),*
+                    #(#variant_to_values)*
                 }
             }
         }
