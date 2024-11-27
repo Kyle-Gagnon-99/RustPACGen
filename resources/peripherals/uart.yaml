@@ -42,6 +42,66 @@ peripheral:
               description: "Receiver is disabled"
             - value: 1
               description: "Receiver is enabled"
+        - id: "rx_dis"
+          bit_range: "3"
+          access: "RW"
+          description: "Receiver disable"
+          reset: 0x1
+          values:
+            - value: 0
+              description: "Receiver is enabled"
+            - value: 1
+              description: "Receiver is disabled"
+        - id: "tx_en"
+          bit_range: "4"
+          access: "RW"
+          description: "Transmitter enable"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Transmitter is disabled"
+            - value: 1
+              description: "Transmitter is enabled"
+        - id: "tx_dis"
+          bit_range: "5"
+          access: "RW"
+          description: "Transmitter disable"
+          reset: 0x1
+          values:
+            - value: 0
+              description: "Transmitter is enabled"
+            - value: 1
+              description: "Transmitter is disabled"
+        - id: "restart_rx_timeout_counter"
+          bit_range: "6"
+          access: "RW"
+          description: "Restart RX timeout counter"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Restart the RX timeout counter. This bit is self clearing once the restart has completed"
+        - id: "start_tx_break"
+          bit_range: "7"
+          access: "RW"
+          description: "Start TX break"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Start to transmit a break after the characters currently present in the FIFO and the transmit shift register have been transmitted. It can only set if STPBRK is not high"
+        - id: "stop_tx_break"
+          bit_range: "8"
+          access: "RW"
+          description: "Stop TX break"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Stop transmission of the break after a minmum of one character length and transmit a high level during 12 bit periods. It can be set regardless of the value of STPBRK"
     - id: "mode_register"
       name: "MR"
       description: "Mode Register"
@@ -98,6 +158,591 @@ peripheral:
             - name: "EvenParity"
               value: 0b000
               description: "Even parity"
+        - id: "stop_bits"
+          bit_range: "7:6"
+          access: "RW"
+          description: "Number of stop bits: Defines the number of stop bits to detect on receive and to generate on transmit"
+          reset: 0x0
+          values:
+            - name: "OneStopBit"
+              value: 0b00
+              description: "1 stop bit"
+            - name: "OnePointFiveStopBits"
+              value: 0b01
+              description: "1.5 stop bits"
+            - name: "TwoStopBits"
+              value: 0b10
+              description: "2 stop bits"
+        - id: "channel_mode"
+          bit_range: "9:8"
+          access: "RW"
+          description: "Channel mode: Defines the mode of operation of the UART"
+          reset: 0x0
+          values:
+            - name: "NormalMode"
+              value: 0b00
+              description: "Normal mode"
+            - name: "AutoEcho"
+              value: 0b01
+              description: "Automatic echo"
+            - name: "LocalLoopback"
+              value: 0b10
+              description: "Local loopback"
+            - name: "RemoteLoopback"
+              value: 0b11
+              description: "Remote loopback"
+    - id: "interrupt_enable"
+      name: "INTERRUPT_ENABLE"
+      description: "Interrupt Enable Register"
+      offset: 0x08
+      access: "W"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "tovr"
+          bit_range: "12"
+          access: "W"
+          description: "Transmitter FIFO Overflow interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "tnful"
+          bit_range: "11"
+          access: "W"
+          description: "Transmitter FIFO Nearly Full interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ttrig"
+          bit_range: "10"
+          access: "W"
+          description: "Transmitter FIFO Trigger interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Disable"
+            - value: 1
+              description: "Enable"
+        - id: "ixr_dms"
+          bit_range: "9"
+          access: "W"
+          description: "Delta Modem Status Indicator interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_tout"
+          bit_range: "8"
+          access: "W"
+          description: "Receiver Timeout Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_parity"
+          bit_range: "7"
+          access: "W"
+          description: "Receiver Parity Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Disable"
+            - value: 1
+              description: "Enable"
+        - id: "ixr_framing"
+          bit_range: "6"
+          access: "W"
+          description: "Receiver Framing Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_over"
+          bit_range: "5"
+          access: "W"
+          description: "Receiver Overflow Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_txfull"
+          bit_range: "4"
+          access: "W"
+          description: "Transmitter FIFO Full interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_txempty"
+          bit_range: "3"
+          access: "W"
+          description: "Transmitter FIFO Empty interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Disable"
+            - value: 1
+              description: "Enable"
+        - id: "ixr_rxfull"
+          bit_range: "2"
+          access: "W"
+          description: "Receiver FIFO Full interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_rxempty"
+          bit_range: "1"
+          access: "W"
+          description: "Receiver FIFO Empty interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+        - id: "ixr_rxovr"
+          bit_range: "0"
+          access: "W"
+          description: "Receiver FIFO Trigger interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Enable (clears mask = 0)"
+    - id: "interrupt_disable"
+      name: "INTERRUPT_DISABLE"
+      description: "Interrupt Disable Register"
+      offset: 0x0C
+      access: "W"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "tovr"
+          bit_range: "12"
+          access: "W"
+          description: "Transmitter FIFO Overflow interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "tnful"
+          bit_range: "11"
+          access: "W"
+          description: "Transmitter FIFO Nearly Full interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ttrig"
+          bit_range: "10"
+          access: "W"
+          description: "Transmitter FIFO Trigger interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_dms"
+          bit_range: "9"
+          access: "W"
+          description: "Delta Modem Status Indicator interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_tout"
+          bit_range: "8"
+          access: "W"
+          description: "Receiver Timeout Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_parity"
+          bit_range: "7"
+          access: "W"
+          description: "Receiver Parity Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_framing"
+          bit_range: "6"
+          access: "W"
+          description: "Receiver Framing Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_over"
+          bit_range: "5"
+          access: "W"
+          description: "Receiver Overflow Error interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_txfull"
+          bit_range: "4"
+          access: "W"
+          description: "Transmitter FIFO Full interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_txempty"
+          bit_range: "3"
+          access: "W"
+          description: "Transmitter FIFO Empty interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_rxfull"
+          bit_range: "2"
+          access: "W"
+          description: "Receiver FIFO Full interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_rxempty"
+          bit_range: "1"
+          access: "W"
+          description: "Receiver FIFO Empty interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+        - id: "ixr_rxovr"
+          bit_range: "0"
+          access: "W"
+          description: "Receiver FIFO Trigger interrupt"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No affect"
+            - value: 1
+              description: "Disable (sets mask = 1)"
+    - id: "interrupt_mask"
+      name: "INTERRUPT_MASK"
+      description: "Interrupt Mask Register"
+      offset: 0x10
+      access: "R"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "tovr"
+          bit_range: "12"
+          access: "R"
+          description: "Transmitter FIFO Overflow interrupt status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "tnful"
+          bit_range: "11"
+          access: "R"
+          description: "Transmitter FIFO Nearly Full interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ttrig"
+          bit_range: "10"
+          access: "R"
+          description: "Transmitter FIFO Trigger interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_dms"
+          bit_range: "9"
+          access: "R"
+          description: "Delta Modem Status Indicator interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_tout"
+          bit_range: "8"
+          access: "R"
+          description: "Receiver Timeout Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_parity"
+          bit_range: "7"
+          access: "R"
+          description: "Receiver Parity Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_framing"
+          bit_range: "6"
+          access: "R"
+          description: "Receiver Framing Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_over"
+          bit_range: "5"
+          access: "R"
+          description: "Receiver Overflow Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_txfull"
+          bit_range: "4"
+          access: "R"
+          description: "Transmitter FIFO Full interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_txempty"
+          bit_range: "3"
+          access: "R"
+          description: "Transmitter FIFO Empty interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_rxfull"
+          bit_range: "2"
+          access: "R"
+          description: "Receiver FIFO Full interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_rxempty"
+          bit_range: "1"
+          access: "R"
+          description: "Receiver FIFO Empty interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+        - id: "ixr_rxovr"
+          bit_range: "0"
+          access: "R"
+          description: "Receiver FIFO Trigger interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Interrupt is disabled"
+            - value: 1
+              description: "Interrupt is enabled"
+    - id: "interrupt_status"
+      name: "ISR"
+      description: "Channel Interrupt Status Register"
+      offset: 0x14
+      access: "W"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "tovr"
+          bit_range: "12"
+          access: "W"
+          description: "Transmitter FIFO Overflow interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "tnful"
+          bit_range: "11"
+          access: "W"
+          description: "Transmitter FIFO Nearly Full interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ttrig"
+          bit_range: "10"
+          access: "W"
+          description: "Transmitter FIFO Trigger interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_dms"
+          bit_range: "9"
+          access: "W"
+          description: "Delta Modem Status Indicator interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_tout"
+          bit_range: "8"
+          access: "W"
+          description: "Receiver Timeout Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_parity"
+          bit_range: "7"
+          access: "W"
+          description: "Receiver Parity Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_framing"
+          bit_range: "6"
+          access: "W"
+          description: "Receiver Framing Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_over"
+          bit_range: "5"
+          access: "W"
+          description: "Receiver Overflow Error interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_txfull"
+          bit_range: "4"
+          access: "W"
+          description: "Transmitter FIFO Full interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_txempty"
+          bit_range: "3"
+          access: "W"
+          description: "Transmitter FIFO Empty interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_rxfull"
+          bit_range: "2"
+          access: "W"
+          description: "Receiver FIFO Full interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_rxempty"
+          bit_range: "1"
+          access: "W"
+          description: "Receiver FIFO Empty interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
+        - id: "ixr_rxovr"
+          bit_range: "0"
+          access: "W"
+          description: "Receiver FIFO Trigger interrupt mask status"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "No interrupt occurred"
+            - value: 1
+              description: "Interrupt occurred"
     - id: "baud_gen"
       name: "BAUDGEN"
       description: "Baud Rate Generator"
@@ -111,3 +756,236 @@ peripheral:
           access: "RW"
           description: "Baud rate clock divisor value"
           reset: 0x28B
+    - id: "rx_timeout"
+      name: "RXTIMEOUT"
+      description: "Receiver TImeout Register"
+      offset: 0x1C
+      access: "RW"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "rto"
+          bit_range: "7:0"
+          access: "RW"
+          description: "Receiver timeout value"
+          reset: 0x0
+    - id: "rx_fifo_trigger_level"
+      name: "RXWM"
+      description: "Receiver FIFO Trigger Level Register"
+      offset: 0x20
+      access: "RW"
+      size: 32
+      reset: 0x20
+      fields:
+        - id: "rx_trig"
+          bit_range: "5:0"
+          access: "RW"
+          description: "Receiver FIFO trigger level value"
+          reset: 0x20
+    - id: "modem_ctrl"
+      name: "MCR"
+      description: "Modem Control Register"
+      offset: 0x24
+      access: "RW"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "fcm"
+          bit_range: "5"
+          access: "RW"
+          description: "Automatic flow control mode"
+          reset: 0x0
+          values:
+            - value: 0
+              description: "Disable: Transmission is continuous regardless of the value of the EMIOUARTxCTSN input, and the EMIOUARTxRTSN output is driven completely under software control."
+            - value: 1
+              description: "Enable: Transmission will only occur when the EMIOUARTxCTSN input is asserted low, and the EMIOUARTxRTSN output is driven using a compare of the RX FIFO fill level to the programmed FDEL value."
+        - id: "rts"
+          bit_range: "1"
+          access: "RW"
+          description: >
+            Request to send output control:
+            This bit is ignored if automatic flow control mode is enabled by FCM being high. If FCM is low, the value of this bit is inverted when applied to the EMIOUARTxRTSN output.
+          reset: 0x0
+          values:
+            - value: 0
+              description: "EMIOUARTxRTSN output forced to logic 1"
+            - value: 1
+              description: "EMIOUARTxRTSN output forced to logic 0"
+        - id: "dtr"
+          bit_range: "0"
+          access: "RW"
+          description: >
+            Data Terminal Ready:
+            The value of this bit is inverted when applied to the EMIOUARTxDTRN output.
+          reset: 0x0
+          values:
+            - value: 0
+              description: "EMIOUARTxDTRN output forced to logic 1"
+            - value: 1
+              description: "EMIOUARTxDTRN output forced to logic 0"
+    - id: "modem_status"
+      name: "MODEMSTATUS"
+      description: "Modem Status Register"
+      offset: 0x28
+      access: "RW"
+      size: 32
+      reset: 0x0
+      fields:
+        - id: "fcms"
+          bit_range: "8"
+          access: "RW"
+          description: "Flow Control Mode"
+          reset: 0x00
+          values:
+            - value: 0
+              description: "Disabled"
+            - value: 1
+              description: "Enabled"
+        - id: "dcd"
+          bit_range: "7"
+          access: "R"
+          description: >
+            Data Carrier Detect (DCD) input signal from PL (EMIOUARTxDCDN) status:
+            0: input is high
+            1: input is low
+          reset: 0x00
+        - id: "ri"
+          bit_range: "6"
+          access: "R"
+          description: >
+            Ring Indicator (RI) input signal from PL (EMIOUARTxRIN) status:
+            0: input is high
+            1: input is low
+          reset: 0x00
+        - id: "dsr"
+          bit_range: "5"
+          access: "R"
+          description: >
+            Data Set Ready (DSR) input signal from PL (EMIOUARTxDSRN) status:
+            0: input is high
+            1: input is low
+          reset: 0x00
+        - id: "cts"
+          bit_range: "4"
+          access: "R"
+          description: >
+            Clear to Send (CTS) input signal from PL (EMIOUARTxCTSN) status:
+            0: input is high
+            1: input is low
+          reset: 0x00
+        - id: "dcdx"
+          bit_range: "3"
+          access: "W"
+          description: >
+            Delta Data Carrier Detect status:
+            Indicates a change in state of the EMIOUARTxDCDN input since this bit was last cleared.
+            0: No change has occurred
+            1: Change has occurred
+          reset: 0x00
+        - id: "rix"
+          bit_range: "2"
+          access: "W"
+          description: >
+            Trailing Edge Ring Indicator status:
+            Indicates that the EMIOUARTxRIN input has changed from high to low state since this bit was last cleared.
+            0: No trailing edge has occurred
+            1: Trailing edge has occurred
+          reset: 0x00
+        - id: "dsrx"
+          bit_range: "1"
+          access: "W"
+          description: >
+            Delta Data Set Ready status:
+            Indicates a change in state of the EMIOUARTxDSRN input since this bit was last cleared.
+            0: No change has occurred
+            1: Change has occurred
+          reset: 0x00
+        - id: "ctsx"
+          bit_range: "0"
+          access: "W"
+          description: >
+            Delta Clear To Send status:
+            Indicates a change in state of the EMIOUARTxCTSN input since this bit was last cleared.
+            0: No change has occurred
+            1: Change has occurred
+          reset: 0x00
+    - id: "channel_status"
+      name: "CHNLSTATUS"
+      description: "Channel Status Register"
+      access: "R"
+      offset: 0x2C
+      size: 32
+      fields:
+        - id: "tnful"
+          bit_range: "14"
+          access: "R"
+          description: >
+            Transmitter FIFO Nearly Full continuous status:
+            This indicates that there is not enough space for the number of bytes currently specified in the WSIZE bits in the Mode register.
+            If a write were currently attempted it would cause an overflow.
+            0: More than one byte is unused in the Tx FIFO
+            1: Only one byte is free in the Tx FIFO
+        - id: "ttrig"
+          bit_range: "13"
+          access: "R"
+          description: >
+            Transmitter FIFO Trigger continuous status:
+            0: Tx FIFO fill level is less than TTRIG
+            1: Tx FIFO fill level is greater than or equal to TTRIG
+        - id: "flowdel"
+          bit_range: "12"
+          access: "R"
+          description: >
+            Receiver flow delay trigger continuous status:
+            0: Rx FIFO fill level is less than FDEL
+            1: Rx FIFO fill level is greater than or equal to FDEL
+        - id: "tactive"
+          bit_range: "11"
+          access: "R"
+          description: >
+            Transmitter state machine active status:
+            0: Inactive state
+            1: Active state
+        - id: "ractive"
+          bit_range: "10"
+          access: "R"
+          description: >
+            Receiver state machine active status:
+            0: Inactive state
+            1: Active state
+        - id: "txfull"
+          bit_range: "4"
+          access: "R"
+          description: >
+            Transmitter FIFO Full continuous status:
+            0: Tx FIFO is not full
+            1: Tx FIFO is full
+        - id: "txempty"
+          bit_range: "3"
+          access: "R"
+          description: >
+            Transmitter FIFO Empty continuous status:
+            0: Tx FIFO is not empty
+            1: Tx FIFO is empty
+        - id: "rxfull"
+          bit_range: "2"
+          access: "R"
+          description: >
+            Receiver FIFO Full continuous status:
+            0: Rx FIFO is not full
+            1: Rx FIFO is full
+        - id: "rxempty"
+          bit_range: "1"
+          access: "R"
+          description: >
+            Receiver FIFO Empty continuous status:
+            0: Rx FIFO is not empty
+            1: Rx FIFO is empty
+        - id: "rxovr"
+          bit_range: "0"
+          access: "R"
+          description: >
+            Receiver FIFO Trigger continuous status:
+            0: Rx FIFO fill level is less than RTRIG
+            1: Rx FIFO fill level is greater than or equal to RTRIG 

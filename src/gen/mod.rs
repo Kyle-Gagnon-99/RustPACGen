@@ -296,11 +296,6 @@ pub fn generate_peripheral(peripheral: &Peripheral) -> String {
 
     //debug!("TokenStream: {:#?}", register);
     let gen_content = quote! {
-        //! Peripheral: #peripheral_name
-        //! Description: #peripheral.description
-        //! Registers:
-        //! #(#register_mod_names)*
-
         #(#register_mod_names)*
 
         #(#register_use_mod_names)*
@@ -368,7 +363,22 @@ pub fn generate_register(register: &Register) -> String {
         _ => quote! {},
     };
 
+    let use_crate_traits = match register.access.as_str() {
+        "R" => quote! {
+            use crate::{Read, BitAccessRead, FieldAccessRead};
+        },
+        "W" => quote! {
+            use crate::{Write, BitAccessWrite, FieldAccessWrite};
+        },
+        "RW" => quote! {
+            use crate::{Read, Write, ReadWrite, BitAccessRead, BitAccessWrite, BitAccessReadWrite, FieldAccessRead, FieldAccessWrite, FieldAccessReadWrite};
+        },
+        _ => quote! {},
+    };
+
     let gen_content = quote! {
+        #use_crate_traits
+
         pub struct #register_ident {
             address: usize,
         }
@@ -391,30 +401,8 @@ pub fn generate_register(register: &Register) -> String {
 
         #(#enum_fields)*
     };
-    quote! {
-        pub struct #register_ident {
-            address: usize,
-        }
 
-        impl Register for #register_ident {
-            fn get_address(&self) -> usize {
-                self.address
-            }
-        }
-
-        #reg_access
-
-        impl #register_ident {
-            pub fn new(address: usize) -> Self {
-                Self {
-                    address
-                }
-            }
-
-            #(#fields)*
-        }
-    };
-
+    debug!("Generated Content: #{:?}", &gen_content.to_string());
     let syn_tree = syn::parse2(gen_content).unwrap();
     prettyplease::unparse(&syn_tree)
 }
@@ -469,12 +457,14 @@ pub fn generate_field(field: &Field) -> TokenStream {
     let get_fn = if access == "R" || access == "RW" {
         if is_single_bit {
             quote! {
+                #[doc = #description]
                 pub fn #get_fn_name(&self) -> bool {
                     self.read_bit(#bit_range)
                 }
             }
         } else {
             quote! {
+                #[doc = #description]
                 pub fn #get_fn_name(&self) -> #field_type {
                     self.read_field(#bit_range)
                 }
@@ -487,12 +477,14 @@ pub fn generate_field(field: &Field) -> TokenStream {
     let set_fn = if access == "W" {
         if is_single_bit {
             quote! {
+                #[doc = #description]
                 pub fn #set_fn_name(&mut self, value: bool) {
                     self.write_bit_no_mask(#bit_range, value);
                 }
             }
         } else {
             quote! {
+                #[doc = #description]
                 pub fn #set_fn_name(&mut self, value: #field_type) {
                     self.write_field_no_mask(#bit_range, value);
                 }
@@ -501,12 +493,14 @@ pub fn generate_field(field: &Field) -> TokenStream {
     } else if access == "RW" {
         if is_single_bit {
             quote! {
+                #[doc = #description]
                 pub fn #set_fn_name(&mut self, value: bool) {
                     self.write_bit(#bit_range, value);
                 }
             }
         } else {
             quote! {
+                #[doc = #description]
                 pub fn #set_fn_name(&mut self, value: #field_type) {
                     self.write_field(#bit_range, value);
                 }
@@ -517,10 +511,8 @@ pub fn generate_field(field: &Field) -> TokenStream {
     };
 
     quote! {
-        #[doc = #description]
         #get_fn
 
-        #[doc = #description]
         #set_fn
     }
 }

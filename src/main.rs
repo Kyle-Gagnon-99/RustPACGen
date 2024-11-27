@@ -55,7 +55,7 @@ fn main() {
             .unwrap_or_else(|| panic!("Failed to convert entry file path to string")),
     );
 
-    debug!("Parsed project: {:#?}", project);
+    //debug!("Parsed project: {:#?}", project);
 
     let mut peripherals: Vec<Peripheral> = Vec::new();
 
@@ -79,7 +79,7 @@ fn main() {
                 .unwrap_or_else(|| panic!("Failed to convert include file path to string")),
         );
 
-        debug!("Parsed peripheral: {:#?}", peripheral);
+        //debug!("Parsed peripheral: {:#?}", peripheral);
 
         // Add the parsed peripheral to the list of peripherals
         peripherals.push(peripheral);

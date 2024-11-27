@@ -1,0 +1,5 @@
+{
+    "yaml.schemas": {
+        "file:///workspaces/RustPACGen/board-peripheral-schema.json": "file:///workspaces/RustPACGen/resources/peripherals/uart.yaml"
+    }
+}

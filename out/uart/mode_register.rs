@@ -1,3 +1,7 @@
+use crate::{
+    Read, Write, ReadWrite, BitAccessRead, BitAccessWrite, BitAccessReadWrite,
+    FieldAccessRead, FieldAccessWrite, FieldAccessReadWrite,
+};
 pub struct ModeRegister {
     address: usize,
 }
@@ -42,6 +46,22 @@ impl ModeRegister {
     ///Parity type select: Defines the expected parity to check on receive and the parity to generate on transmit
     pub fn set_parity(&mut self, value: Parity) {
         self.write_field(3u32..=5u32, value);
+    }
+    ///Number of stop bits: Defines the number of stop bits to detect on receive and to generate on transmit
+    pub fn get_stop_bits(&self) -> StopBits {
+        self.read_field(6u32..=7u32)
+    }
+    ///Number of stop bits: Defines the number of stop bits to detect on receive and to generate on transmit
+    pub fn set_stop_bits(&mut self, value: StopBits) {
+        self.write_field(6u32..=7u32, value);
+    }
+    ///Channel mode: Defines the mode of operation of the UART
+    pub fn get_channel_mode(&self) -> ChannelMode {
+        self.read_field(8u32..=9u32)
+    }
+    ///Channel mode: Defines the mode of operation of the UART
+    pub fn set_channel_mode(&mut self, value: ChannelMode) {
+        self.write_field(8u32..=9u32, value);
     }
 }
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -105,6 +125,66 @@ impl Into<u32> for Parity {
             Parity::SpaceParity => 2u32,
             Parity::OddParity => 1u32,
             Parity::EvenParity => 0u32,
+        }
+    }
+}
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum StopBits {
+    ///1 stop bit
+    OneStopBit = 0u32,
+    ///1.5 stop bits
+    OnePointFiveStopBits = 1u32,
+    ///2 stop bits
+    TwoStopBits = 2u32,
+}
+impl From<u32> for StopBits {
+    fn from(value: u32) -> Self {
+        match value {
+            0u32 => StopBits::OneStopBit,
+            1u32 => StopBits::OnePointFiveStopBits,
+            2u32 => StopBits::TwoStopBits,
+            _ => panic!("Invalid value for enum #enum_name: {:#X}", value),
+        }
+    }
+}
+impl Into<u32> for StopBits {
+    fn into(self) -> u32 {
+        match self {
+            StopBits::OneStopBit => 0u32,
+            StopBits::OnePointFiveStopBits => 1u32,
+            StopBits::TwoStopBits => 2u32,
+        }
+    }
+}
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum ChannelMode {
+    ///Normal mode
+    NormalMode = 0u32,
+    ///Automatic echo
+    AutoEcho = 1u32,
+    ///Local loopback
+    LocalLoopback = 2u32,
+    ///Remote loopback
+    RemoteLoopback = 3u32,
+}
+impl From<u32> for ChannelMode {
+    fn from(value: u32) -> Self {
+        match value {
+            0u32 => ChannelMode::NormalMode,
+            1u32 => ChannelMode::AutoEcho,
+            2u32 => ChannelMode::LocalLoopback,
+            3u32 => ChannelMode::RemoteLoopback,
+            _ => panic!("Invalid value for enum #enum_name: {:#X}", value),
+        }
+    }
+}
+impl Into<u32> for ChannelMode {
+    fn into(self) -> u32 {
+        match self {
+            ChannelMode::NormalMode => 0u32,
+            ChannelMode::AutoEcho => 1u32,
+            ChannelMode::LocalLoopback => 2u32,
+            ChannelMode::RemoteLoopback => 3u32,
         }
     }
 }
