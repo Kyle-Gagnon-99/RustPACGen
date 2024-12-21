@@ -1,0 +1,196 @@
+{
+    "$schema": "../pac-schema.json",
+    "name": "Zynq-7000",
+    "peripherals": [
+        {
+            "name": "UART",
+            "base_address": "0xE0001000",
+            "registers": [
+                {
+                    "name": "CONTROL",
+                    "access": "read-write",
+                    "description": "UART control register",
+                    "offset": "0x0",
+                    "size": 32,
+                    "fields": [
+                        {
+                            "name": "sw_rx_rst",
+                            "description": "Software reset for Rx data path",
+                            "bit_range": "0"
+                        },
+                        {
+                            "name": "sw_tx_rst",
+                            "description": "Software reset for Tx data path",
+                            "bit_range": "1"
+                        },
+                        {
+                            "name": "rx_en",
+                            "description": "Receive enable",
+                            "bit_range": "2"
+                        },
+                        {
+                            "name": "rx_dis",
+                            "default_value": 1,
+                            "description": "Receive disable",
+                            "bit_range": "3"
+                        },
+                        {
+                            "name": "tx_en",
+                            "description": "Transmit enable",
+                            "bit_range": "4"
+                        },
+                        {
+                            "name": "tx_dis",
+                            "description": "Transmit disable",
+                            "bit_range": "5"
+                        },
+                        {
+                            "name": "rst_toc",
+                            "description": "Reset timeout counter",
+                            "bit_range": "6"
+                        },
+                        {
+                            "name": "start_tx_break",
+                            "description": "Start transmitter break",
+                            "bit_range": "7"
+                        },
+                        {
+                            "name": "stop_tx_break",
+                            "description": "Stop transmitter break",
+                            "bit_range": "8",
+                            "default_value": 1
+                        }
+                    ]
+                },
+                {
+                    "name": "MODE",
+                    "access": "read-write",
+                    "description": "UART mode register",
+                    "offset": "0x4",
+                    "size": 32,
+                    "fields": [
+                        {
+                            "name": "clk_sel",
+                            "description": "Clock select",
+                            "bit_range": "0"
+                        },
+                        {
+                            "name": "char_len",
+                            "description": "Character Length",
+                            "bit_range": "[2:1]",
+                            "enums": [
+                                {
+                                    "name": "EightBits",
+                                    "description": "8 bits",
+                                    "value": "0b00",
+                                    "is_default": true
+                                },
+                                {
+                                    "name": "SevenBits",
+                                    "description": "7 bits",
+                                    "value": "0b10"
+                                },
+                                {
+                                    "name": "SixBits",
+                                    "description": "6 bits",
+                                    "value": "0b11"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "parity",
+                            "description": "Parity type select",
+                            "bit_range": "[5:3]",
+                            "enums": [
+                                {
+                                    "name": "Even",
+                                    "description": "Even parity",
+                                    "value": "0b000",
+                                    "is_default": true
+                                },
+                                {
+                                    "name": "Odd",
+                                    "description": "Odd parity",
+                                    "value": "0b001"
+                                },
+                                {
+                                    "name": "Space",
+                                    "description": "Space parity",
+                                    "value": "0b010"
+                                },
+                                {
+                                    "name": "Mark",
+                                    "description": "Mark parity",
+                                    "value": "0b011"
+                                },
+                                {
+                                    "name": "None",
+                                    "description": "No parity",
+                                    "value": "0b100"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "num_stop_bits",
+                            "description": "Number of stop bits",
+                            "bit_range": "[7:6]",
+                            "enums": [
+                                {
+                                    "name": "One",
+                                    "description": "1 stop bit",
+                                    "value": "0b00",
+                                    "is_default": true
+                                },
+                                {
+                                    "name": "OneAndHalf",
+                                    "description": "1.5 stop bits",
+                                    "value": "0b01"
+                                },
+                                {
+                                    "name": "Two",
+                                    "description": "2 stop bits",
+                                    "value": "0b10"
+                                }
+                            ]
+                        },
+                        {
+                            "name": "channel_mode",
+                            "description": "Channel mode select",
+                            "bit_range": "[9:8]",
+                            "enums": [
+                                {
+                                    "name": "Normal",
+                                    "description": "Normal mode",
+                                    "value": "0b00",
+                                    "is_default": true
+                                },
+                                {
+                                    "name": "AutoEcho",
+                                    "description": "Automatic echo",
+                                    "value": "0b01"
+                                },
+                                {
+                                    "name": "LocalLoop",
+                                    "description": "Local loopback",
+                                    "value": "0b10"
+                                },
+                                {
+                                    "name": "RemoteLoop",
+                                    "description": "Remote loopback",
+                                    "value": "0b11"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "name": "IER",
+                    "access": "read-write",
+                    "description": "UART interrupt enable register",
+                    "offset": "0x8",
+                    "size": 32
+                }
+            ]
+        }
+    ]
+}

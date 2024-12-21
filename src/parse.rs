@@ -1,33 +1,26 @@
-use crate::config::{Peripheral, PeripheralWrapper, Project, ProjectWrapper};
+use serde::Deserialize;
 
-/// Parses the project configuration file into a Project struct
+/// The parse module contains logic and data structures for parsing the input JSON file
+/// using the serde library.
 ///
-/// # Arguments
-/// file_path: &str - The path to the project configuration file
-///
-/// # Returns
-/// Project - The parsed project configuration
-pub fn parse_project(file_path: &str) -> Project {
-    let content = std::fs::read_to_string(file_path)
-        .unwrap_or_else(|_| panic!("Failed to read file: {}", file_path));
 
-    serde_yaml::from_str::<ProjectWrapper>(&content)
-        .unwrap()
-        .project
+#[derive(Deserialize, Debug)]
+pub struct PeripheralAccess {
+    pub name: String,
+    pub peripherals: Vec<Peripheral>,
 }
 
-/// Parses the peripheral configuration file into a Peripheral struct
-///
-/// # Arguments
-/// file_path: &str - The path to the peripheral configuration file
-///
-/// # Returns
-/// Peripheral - The parsed peripheral configuration
-pub fn parse_peripheral(file_path: &str) -> Peripheral {
-    let content = std::fs::read_to_string(file_path)
-        .unwrap_or_else(|_| panic!("Failed to read file: {}", file_path));
+#[derive(Deserialize, Debug)]
+pub struct Peripheral {
+    pub name: String,
+    pub base_address: String,
+    pub registers: Vec<Register>,
+}
 
-    serde_yaml::from_str::<PeripheralWrapper>(&content)
-        .unwrap()
-        .peripheral
+#[derive(Deserialize, Debug)]
+pub struct Register {
+    pub name: String,
+    pub offset: String,
+    pub size: usize,
+    pub access: String,
 }

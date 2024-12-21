@@ -1,0 +1,137 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the PAC"
+        },
+        "peripherals": {
+            "type": "array",
+            "items": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the peripheral."
+                    },
+                    "base_address": {
+                        "type": "string",
+                        "pattern": "^0x[0-9a-fA-F]+$",
+                        "description": "The base memory address of the peripheral, in hexadecimal."
+                    },
+                    "registers": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "The name of the register."
+                                },
+                                "offset": {
+                                    "type": "string",
+                                    "pattern": "^0x[0-9a-fA-F]+$",
+                                    "description": "The offset of the register from the peripheral's base address."
+                                },
+                                "size": {
+                                    "type": "integer",
+                                    "description": "The size of the register in bits (e.g., 32 for a 32-bit register)."
+                                },
+                                "access": {
+                                    "type": "string",
+                                    "enum": [
+                                        "read-only",
+                                        "write-only",
+                                        "read-write"
+                                    ],
+                                    "description": "The access permissions for the register."
+                                },
+                                "reset_value": {
+                                    "type": "string",
+                                    "pattern": "^0x[0-9a-fA-F]+$",
+                                    "description": "The default reset value for the register."
+                                },
+                                "fields": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "The name of the field."
+                                            },
+                                            "bit_range": {
+                                                "type": "string",
+                                                "pattern": "^(\\d+|\\[\\d+:\\d+\\])$",
+                                                "description": "The bit range for the field. Single bit: '0', range: '[4:0]'."
+                                            },
+                                            "default_value": {
+                                                "type": "integer",
+                                                "description": "The default value for the field, if any."
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "description": "A human-readable description of the field."
+                                            },
+                                            "access": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "read-only",
+                                                    "write-only",
+                                                    "read-write"
+                                                ],
+                                                "description": "The access permissions for the field. By default, it is assumed to be read-write"
+                                            },
+                                            "enums": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string",
+                                                            "description": "The name of the enum value."
+                                                        },
+                                                        "description": {
+                                                            "type": "string",
+                                                            "description": "A human-readable description of the enum value."
+                                                        },
+                                                        "value": {
+                                                            "type": "string",
+                                                            "pattern": "^(0x[0-9a-fA-F]+|0b[01]+|\\d+)$",
+                                                            "description": "The value of the enum value."
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "name",
+                                            "bit_range"
+                                        ]
+                                    },
+                                    "description": "The bitfields within the register, if any."
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "description": "A human-readable description of the register."
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "offset",
+                                "size",
+                                "access"
+                            ]
+                        },
+                        "description": "The registers belonging to this peripheral."
+                    }
+                },
+                "required": [
+                    "name",
+                    "base_address",
+                    "registers"
+                ]
+            }
+        }
+    }
+}
