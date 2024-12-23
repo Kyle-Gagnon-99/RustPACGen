@@ -83,22 +83,31 @@
                                                 "description": "The access permissions for the field. By default, it is assumed to be read-write"
                                             },
                                             "enums": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "name": {
-                                                            "type": "string",
-                                                            "description": "The name of the enum value."
-                                                        },
-                                                        "description": {
-                                                            "type": "string",
-                                                            "description": "A human-readable description of the enum value."
-                                                        },
-                                                        "value": {
-                                                            "type": "string",
-                                                            "pattern": "^(0x[0-9a-fA-F]+|0b[01]+|\\d+)$",
-                                                            "description": "The value of the enum value."
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "The name of the enumeration."
+                                                    },
+                                                    "values": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "description": "The name of the enum value."
+                                                                },
+                                                                "description": {
+                                                                    "type": "string",
+                                                                    "description": "A human-readable description of the enum value."
+                                                                },
+                                                                "value": {
+                                                                    "type": "string",
+                                                                    "pattern": "^(0x[0-9a-fA-F]+|0b[01]+|\\d+)$",
+                                                                    "description": "The value of the enum value."
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }

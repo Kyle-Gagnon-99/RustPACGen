@@ -78,108 +78,120 @@
                             "name": "char_len",
                             "description": "Character Length",
                             "bit_range": "[2:1]",
-                            "enums": [
-                                {
-                                    "name": "EightBits",
-                                    "description": "8 bits",
-                                    "value": "0b00",
-                                    "is_default": true
-                                },
-                                {
-                                    "name": "SevenBits",
-                                    "description": "7 bits",
-                                    "value": "0b10"
-                                },
-                                {
-                                    "name": "SixBits",
-                                    "description": "6 bits",
-                                    "value": "0b11"
-                                }
-                            ]
+                            "enums": {
+                                "name": "CharacterLength",
+                                "values": [
+                                    {
+                                        "name": "EightBits",
+                                        "description": "8 bits",
+                                        "value": "0b00",
+                                        "is_default": true
+                                    },
+                                    {
+                                        "name": "SevenBits",
+                                        "description": "7 bits",
+                                        "value": "0b10"
+                                    },
+                                    {
+                                        "name": "SixBits",
+                                        "description": "6 bits",
+                                        "value": "0b11"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "name": "parity",
                             "description": "Parity type select",
                             "bit_range": "[5:3]",
-                            "enums": [
-                                {
-                                    "name": "Even",
-                                    "description": "Even parity",
-                                    "value": "0b000",
-                                    "is_default": true
-                                },
-                                {
-                                    "name": "Odd",
-                                    "description": "Odd parity",
-                                    "value": "0b001"
-                                },
-                                {
-                                    "name": "Space",
-                                    "description": "Space parity",
-                                    "value": "0b010"
-                                },
-                                {
-                                    "name": "Mark",
-                                    "description": "Mark parity",
-                                    "value": "0b011"
-                                },
-                                {
-                                    "name": "None",
-                                    "description": "No parity",
-                                    "value": "0b100"
-                                }
-                            ]
+                            "enums": {
+                                "name": "ParityType",
+                                "values": [
+                                    {
+                                        "name": "Even",
+                                        "description": "Even parity",
+                                        "value": "0b000",
+                                        "is_default": true
+                                    },
+                                    {
+                                        "name": "Odd",
+                                        "description": "Odd parity",
+                                        "value": "0b001"
+                                    },
+                                    {
+                                        "name": "Space",
+                                        "description": "Space parity",
+                                        "value": "0b010"
+                                    },
+                                    {
+                                        "name": "Mark",
+                                        "description": "Mark parity",
+                                        "value": "0b011"
+                                    },
+                                    {
+                                        "name": "None",
+                                        "description": "No parity",
+                                        "value": "0b100"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "name": "num_stop_bits",
                             "description": "Number of stop bits",
                             "bit_range": "[7:6]",
-                            "enums": [
-                                {
-                                    "name": "One",
-                                    "description": "1 stop bit",
-                                    "value": "0b00",
-                                    "is_default": true
-                                },
-                                {
-                                    "name": "OneAndHalf",
-                                    "description": "1.5 stop bits",
-                                    "value": "0b01"
-                                },
-                                {
-                                    "name": "Two",
-                                    "description": "2 stop bits",
-                                    "value": "0b10"
-                                }
-                            ]
+                            "enums": {
+                                "name": "StopBits",
+                                "values": [
+                                    {
+                                        "name": "One",
+                                        "description": "1 stop bit",
+                                        "value": "0b00",
+                                        "is_default": true
+                                    },
+                                    {
+                                        "name": "OneAndHalf",
+                                        "description": "1.5 stop bits",
+                                        "value": "0b01"
+                                    },
+                                    {
+                                        "name": "Two",
+                                        "description": "2 stop bits",
+                                        "value": "0b10"
+                                    }
+                                ]
+                            }
                         },
                         {
                             "name": "channel_mode",
                             "description": "Channel mode select",
                             "bit_range": "[9:8]",
-                            "enums": [
-                                {
-                                    "name": "Normal",
-                                    "description": "Normal mode",
-                                    "value": "0b00",
-                                    "is_default": true
-                                },
-                                {
-                                    "name": "AutoEcho",
-                                    "description": "Automatic echo",
-                                    "value": "0b01"
-                                },
-                                {
-                                    "name": "LocalLoop",
-                                    "description": "Local loopback",
-                                    "value": "0b10"
-                                },
-                                {
-                                    "name": "RemoteLoop",
-                                    "description": "Remote loopback",
-                                    "value": "0b11"
-                                }
-                            ]
+                            "enums": {
+                                "name": "ChannelMode",
+                                "values": [
+                                    {
+                                        "name": "Normal",
+                                        "description": "Normal mode",
+                                        "value": "0b00",
+                                        "is_default": true
+                                    },
+                                    {
+                                        "name": "AutoEcho",
+                                        "description": "Automatic echo",
+                                        "value": "0b01"
+                                    },
+                                    {
+                                        "name": "LocalLoop",
+                                        "description": "Local loopback",
+                                        "value": "0b10"
+                                    },
+                                    {
+                                        "name": "RemoteLoop",
+                                        "description": "Remote loopback",
+                                        "value": "0b11"
+                                    }
+                                ]
+                            }
                         }
                     ]
                 },

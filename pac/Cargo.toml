@@ -1,0 +1,9 @@
+[package]
+name = "pac"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bit_field = "0.10.2"
+volatile_register = "0.2.2"
+        
