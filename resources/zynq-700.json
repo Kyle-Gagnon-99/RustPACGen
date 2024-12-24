@@ -1,6 +1,7 @@
 {
     "$schema": "../pac-schema.json",
     "name": "Zynq-7000",
+    "register_size": 32,
     "peripherals": [
         {
             "name": "UART",

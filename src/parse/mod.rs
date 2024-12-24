@@ -14,6 +14,8 @@ pub mod utils;
 #[derive(Deserialize, Debug)]
 pub struct PeripheralAccess {
     pub name: String,
+    pub register_size: usize,
+    pub is_no_std: Option<bool>,
     pub peripherals: Vec<Peripheral>,
 }
 
@@ -81,6 +83,7 @@ pub struct Enum {
 /// The EnumValues struct represents a single enumeration value for a field.
 #[derive(Deserialize, Debug)]
 pub struct EnumValue {
+    pub name: String,
     #[serde(deserialize_with = "utils::deserialize_num")]
     pub value: usize,
     pub description: String,

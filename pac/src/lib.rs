@@ -2,9 +2,6 @@
 pub use bit_field::BitField;
 pub use volatile_register::{RO, WO, RW};
 pub mod uart;
-pub trait VolatileRegister<RawType: Sized> {
-    fn get_inner(&self) -> &VolatileCell<RawType>;
-}
 /// Converts a builder struct into raw bits and vice versa
 ///
 /// RawType: The raw bits type (a primitive integer type)
