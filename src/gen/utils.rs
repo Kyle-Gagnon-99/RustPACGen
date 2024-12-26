@@ -4,6 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use log::debug;
 use proc_macro2::TokenStream;
 use quote::quote;
 
@@ -44,6 +45,7 @@ pub fn write_to_file_str(file_path: &PathBuf, content: &str) -> std::io::Result<
 /// # Returns
 /// A formatted Rust code string.
 pub fn format_token_stream(token_stream: &TokenStream) -> String {
+    debug!("Formatting TokenStream: {:?}", token_stream.to_string());
     prettyplease::unparse(&syn::parse_file(token_stream.to_string().as_str()).unwrap())
 }
 

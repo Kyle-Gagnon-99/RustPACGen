@@ -25,8 +25,50 @@ impl BitRange {
         // Match the number of parts to determine the type of bit range
         match parts.len() {
             1 => BitRange::Single(parts[0].parse().unwrap()),
-            2 => BitRange::Range(parts[0].parse().unwrap(), parts[1].parse().unwrap()),
+            2 => BitRange::Range(parts[1].parse().unwrap(), parts[0].parse().unwrap()),
             _ => panic!("Invalid bit range: {}", bit_range),
+        }
+    }
+
+    pub fn is_single_bit(&self) -> bool {
+        match self {
+            BitRange::Single(_) => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_bit_range(&self) -> bool {
+        match self {
+            BitRange::Range(_, _) => true,
+            _ => false,
+        }
+    }
+
+    pub fn get_start_bit(&self) -> usize {
+        match self {
+            BitRange::Single(bit) => *bit,
+            BitRange::Range(start, _) => *start,
+        }
+    }
+
+    pub fn get_end_bit(&self) -> usize {
+        match self {
+            BitRange::Single(bit) => *bit,
+            BitRange::Range(_, end) => *end,
+        }
+    }
+
+    pub fn get_bit_range(&self) -> (usize, usize) {
+        match self {
+            BitRange::Single(bit) => (*bit, *bit),
+            BitRange::Range(start, end) => (*start, *end),
+        }
+    }
+
+    pub fn get_size(&self) -> usize {
+        match self {
+            BitRange::Single(_) => 1,
+            BitRange::Range(start, end) => end - start + 1,
         }
     }
 }
@@ -48,7 +90,7 @@ where
     Ok(BitRange::from_string(&bit_range))
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Access {
     ReadOnly,
     WriteOnly,
