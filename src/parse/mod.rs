@@ -7,6 +7,16 @@ use utils::{Access, BitRange};
 
 pub mod utils;
 
+/// The Manifest struct represents the top-level definition of the peripheral access crate.
+/// It contains the name of the peripheral access crate, the register size, whether or not
+/// the crate is no_std compatible, and a list of file names that relate to the peripherals.
+pub struct Manifest {
+    pub name: String,
+    pub register_size: usize,
+    pub is_no_std: Option<bool>,
+    pub peripherals: Vec<String>,
+}
+
 /// The PeripheralAccess struct represents the top-level definition
 /// of the input JSON file.
 ///
